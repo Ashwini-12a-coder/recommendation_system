@@ -1,0 +1,145 @@
+----------------------------------
+SPOTIFY WEB DEVELOPER MAIL:
+aishwaryaaishwarya6705@gmail.com
+Password of  gmail:aishwarya@6705
+----------------------------------
+----------------------------------
+VS CODE FOR RECOMMENDATION SYSTEMS
+----------------------------------
+import pickle
+import streamlit as st
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+CLIENT_ID="79f6f5c07f9e48aa9f18aa64159c1848"
+CLIENT_SECRET="4cab7aa8dd5c4b35a63702b2a73e04fb"
+#Initialize the Spotify client
+client_credentials_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET) 
+sp=spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+def get_song_album_cover_url(song_name, artist_name):
+    search_query=f"track: {song_name} artist: {artist_name}" 
+    results=sp.search(q=search_query, type="track")
+    if results and results["tracks"]["items"]:
+        track=results["tracks"]["items"][0]
+        album_cover_url=track["album"]["images"][0]["url"]
+        print(album_cover_url)
+        return album_cover_url
+    else:
+        return "https://i.postimg.cc/00NxYz4V/social.png"
+def recommend (song):
+    index=music [music['song']==song].index[0]
+    distances=sorted(list(enumerate (similarity [index])), reverse=True, key=lambda x: x[1])
+    recommended_music_names = []
+    recommended_music_posters = []
+    for i in distances [1:6]:
+#fetch the movie poster
+        artist=music.iloc[i[0]].artist
+        print(artist)
+        print(music.iloc[i[0]].song)
+        recommended_music_posters.append(get_song_album_cover_url(music.iloc[i[0]].song, artist))
+        recommended_music_names.append(music.iloc[i[0]].song)
+    return recommended_music_names,recommended_music_posters
+st.header('MUSIC RECOMMENDER SYSTEM')
+music=pickle.load(open('df.pkl', 'rb')) 
+similarity=pickle.load(open('similarity.pkl', 'rb'))
+music_list=music['song'].values 
+selected_movie=st.selectbox(
+    "Type or select a song from the dropdown",
+    music_list
+)
+if st.button('Show Recommendation'):
+    recommended_music_names,recommended_music_posters=recommend(selected_movie)
+    col1, col2, col3, col4, col5=st.columns(5)
+    with col1:
+        st.text(recommended_music_names[0])
+        st.image(recommended_music_posters[0])
+    with col2:
+        st.text(recommended_music_names[1])
+        st.image(recommended_music_posters[1])
+    with col3:
+        st.text(recommended_music_names[2])
+        st.image(recommended_music_posters[2])
+    with col4:
+        st.text(recommended_music_names[3])
+        st.image(recommended_music_posters[3])
+    with col5:
+        st.text(recommended_music_names[4])
+        st.image(recommended_music_posters[4])
+-----------------------------------------------------------
+JUPYTER CODE DATA PROCESSING RECOMMENDER SYSTEMS
+-----------------------------------------------------------
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+
+df=pd.read_csv("SONGS.csv")
+
+df.head(5)
+
+df.tail(5)
+
+df.discribe()
+
+df.shape()
+
+df.isnull().sum()
+
+df['lyrics'][0]
+
+df['lyrics'] = df['lyrics'].str.lower().replace(r'^\w\s', ' ').replace(r'\n', ' ', regex=True)
+
+df.tail(5)
+
+df['lyrics'].str.lower().replace(r'^\w\s',' ').replace(r'\n',' ',regex=True)
+
+df.head(5)
+
+import nltk
+from nltk.stem.porter import PorterStemmer
+
+stremmer=PorterStemmer()
+
+def token(lyrics):
+    token=nltk.word_tokenize(lyrics)
+    a=[stremmer.stem(w) for w in token]
+    return " ".join(a)
+
+token("you are so beautiful")
+
+df['lyrics'].apply(lambda x:token(x))
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+tfid=TfidfVectorizer(analyzer="word",stop_words='english')
+
+tfid.fit_transform(df["lyrics"])
+
+matrix=tfid.fit_transform(df['lyrics'])
+
+cosine_similarity(matrix)
+
+df[df['song']=='Chal Chalo Chalo'].index[0]
+
+#RECOMMENDER FUNCTION
+def recommender(song_name,df):
+  idx=df[df['song']==song_name].index[0]
+  similer=cosine_similarity(matrix)
+  distance=sorted(list(enumerate(similer[idx])),reverse=True,key=lambda x:x[1])
+  song=[]
+  for s_id in distance[1:5]:
+      song.append(df.iloc[s_id[0]].song)
+  return song,similer
+recommendations,similer_matrix=recommender("Rooba Rooba",df)
+print(recommendations)
+
+import pickle
+similer=cosine_similarity(matrix)
+pickle.dump(similer, open("similarity.pkl", "wb"))
+pickle.dump(df, open("df.pkl", "wb"))
+similarity = pickle.load(open("similarity.pkl", "rb"))
+df = pickle.load(open("df.pkl", "rb"))
+---------------------------------------------------------
+
+
+
+
